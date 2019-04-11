@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="shiotsuki_kaedesari">
+    <title>draw_card</title>
+</head>
+<style>
+    body>div{
+        border: 1px solid #bebebe;
+        height: 700px;
+        width: 500px;
+        position: fixed;
+    }
+
+    .is_pay>button, .card_box>button{
+        width: 300px;
+        height: 50px;
+        margin-left: 100px;
+        background: #3170ff;
+        color: white;
+        border: 0;
+        border-radius: 3px;
+        margin-top: 5px;
+        cursor: pointer;
+        outline: none;
+    }
+
+    .is_pay>button{
+        width: 140px;
+    }
+
+    .is_pay>button:active{
+        background: #1c4cff;
+    }
+
+    .is_pay>.up_spirit{
+        margin-left: 5px;
+        width: 150px;
+        font-size: 12px;
+        height: 30px;
+    }
+
+    .card_box>button{
+        background: #ff3e5d;
+    }
+
+    .card_box>button:active{
+        background: #e2033c;
+      }
+
+    .this_times_box{
+        height: 300px;
+        width: 400px;
+        border: 1px solid #c6c6c6;
+        margin: 5px 0 0 50px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .result_box{
+        height: 200px;
+        width: 400px;
+        border: 1px solid #c6c6c6;
+        margin: 20px 0 0 50px;
+        position: relative;
+    }
+
+    .result_box span{
+        display: inline-block;
+    }
+
+    .result_box>div>div{
+        font-size: 14px;
+        margin-top:5px;
+
+    }
+
+    .result_box>.result_box1>div{
+        float: left;
+    }
+
+    .result_box>.result_box1>div>span{
+        width:50px;
+    }
+
+    .result_box>.result_box1{
+        margin-left: 10px;
+    }
+
+    .result_box>.result_box2{
+        float: left;
+        margin-left: 20px;
+        padding-top: 20px;
+        clear: both;
+    }
+
+    .result_box>.result_box3{
+        float: right;
+        padding-top: 20px;
+        margin-right: 80px;
+    }
+    .result_box>.result_box4{
+        position: absolute;
+        top: 130px;
+        left: 10px;
+        width: 300px;
+    }
+
+    .this_times_box>div{
+        width: 80px;
+        height: 80px;
+        margin: 5px 7px;
+        border-radius: 3px;
+    }
+
+    .this_times_box>div>span{
+        display: inline-block;
+        width: 80px;
+        margin-top: 30px;
+        text-align: center;
+        color: #4f4f4f;
+        font-size: 14px;
+    }
+</style>
+<body>
+    <div>
+        <div class="is_pay">
+            <button>充值十连ヽ(￣▽￣)ﾉ</button>
+            <select name="up_spirit" class="up_spirit">
+                <option value="all" selected>请选择要up的5星从者</option>
+            </select>
+        </div>
+        <div class="card_box">
+            <button>十连抽卡！ヽ(￣▽￣)ﾉ</button>
+            <button>一发抽卡！ヽ(￣▽￣)ﾉ</button>
+        </div>
+        <div class="this_times_box">
+            <div><span></span></div>
+        </div>
+        <div class="result_box">
+            <div class="result_box1">
+                <div class="surplus_times">剩余次数： <span>10</span></div>
+                <div class="times">抽卡次数： <span>0</span></div>
+                <div class="pay_times">氪金次数： <span>0</span></div>
+            </div>
+            <div class="result_box2">
+                <div class="ssr_spirit">五星英灵： <span>0</span></div>
+                <div class="sr_spirit">四星英灵： <span>0</span></div>
+                <div class="r_spirit">三星英灵： <span>0</span></div>
+            </div>
+            <div class="result_box3">
+                <div class="ssr_gift">五星礼装： <span>0</span></div>
+                <div class="sr_gift">四星礼装： <span>0</span></div>
+                <div class="r_gift">三星礼装： <span>0</span></div>
+            </div>
+            <div class="result_box4">
+                <div class="up_ssr" style="display: none">up从者： <span>0</span></div>
+            </div>
+
+        </div>
+    </div>
+</body>
+<!--<<script src="jquery-3.3.1.js"></script>-->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    'use strict';
+//    设置窗口
+    let $body_div = $('body>div');
+    $body_div.css({
+        top: window.innerHeight / 2 - 350,
+        left: window.innerWidth / 2 - 250
+    });
+//    初始数据列表
+    let ssr_list = ['李文书', '红阎魔', '布拉达曼特', '始皇帝', '项羽', '志度内', 'bb', '弓白贞', 'CBA' ,'齐格鲁德', '拿破仑',
+                    '魔神总司', '阿喀琉斯', '伊凡雷帝', '阿纳斯塔西亚', '女帝', '葛饰北斋', '艾蕾什基加勒', '阿比', '刑部姬', '骑黑呆',
+                    '泳装尼禄', '福尔摩斯', '杀生院', '梅尔特莉莉丝', '土方','旧剑','莫里亚蒂','BX','宫本武藏','王哈','梅林','提亚马特',
+                    '克亚特尔','恩琪都','伊什塔尔','克里奥帕特拉','伊利亚','弓呆','枪狐','达芬奇','拉二','奶光','三藏','酒吞','黑贞',
+                    '枪呆','大帝','梅芙','黑狗','南丁格尔','岩窟王','天草','花嫁尼禄','布姐','鬼呆','小太阳','阿周那','祖师爷','小莫',
+                    '师匠','杰克','总司','船长','C狐','俄里翁','贞德','大公','金时','孔明','阿提拉','闪闪','呆毛王'];
+    let sr_list = ['美游', '尺子克亚特尔', '虞美人', '秦良玉', '兰陵王', 'C酒吞', '剑刷子', 'xx', '剑梅芙', 'B贞德', '杀阶牛若丸',
+                    '枪茨木', '瓦尔基里', '坂本龙马', '齐格', '喀戎', '黑啊塔', '浅上藤乃', '哪吒', '加藤段藏', '丹马守', '望野千代女',
+                    '帕尔瓦蒂', '巴御前', '伊什塔尔R', '枪奶光', '弓海伦娜', 'B信长', '杀托尼', '剑肯娘', '武则天', 'BB', '铃鹿御前',
+                    '帕森普利','燕青','海森','黑卫宫','戈耳工','枪美杜莎','C闪','枪大公','小黑','玛尔达','枪清姬','泳装小莫','泳装安妮',
+                    '泳装玛丽','高文','特里斯坦','兰斯洛特','赤木童子','R金时','爱丽丝菲尔','切嗣','爱迪生','李书文','罗摩','海伦娜',
+                    '阿福','贝奥武夫','芬恩','肯娘','黑枪呆','童谣','安妮','玉藻猫','长江','卡米拉','B叔','撕腿诺','玛尔达','玛丽',
+                    '龙娘','阿塔','红A','迪昂','飞哥','尼禄','黑呆'];
+    let r_list = ['赤兔马', '冈田以藏', '奥维斯布隆', '安东尼奥·萨列里', '宝藏院胤舜', '哥伦布','豹人','小贝','彩虹剑','表藤太','静谧',
+                '风魔小太郎','白貌','比利','杰罗尼莫','幼闪','亨利','巴蓓奇','霍恩海姆','刷子','和克托尔','大卫','清姬','大流士爱你哦',
+                '吕布', '荆轲','大狗','梅非斯','吉尔德雷','美狄亚','亚历山大','牛若丸','布狄卡','美杜莎','罗马','旧狗','C狗','二姐',
+                '罗宾汉', '吉尔德雷', '胖子'];
+    let ssr_gift_list = ['宝石翁', '2030', '黑杯', '5星礼装', '5星礼装','5星礼装' ,'5星礼装', '5星礼装', '5星礼装', '5星礼装',
+                        '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装','5星礼装',
+                        '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装','5星礼装',
+                        '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装','5星礼装',
+                        '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装', '5星礼装','5星礼装'];
+    let sr_gift_list = ['四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装','四星礼装',
+                        '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装','四星礼装',
+                        '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装','四星礼装',
+                        '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装','四星礼装',
+                        '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装', '四星礼装','四星礼装',];
+    let r_gift_list = ['三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装',
+                        '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装',
+                        '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装',
+                        '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装',
+                        '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装',
+                        '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装',
+                        '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装', '三星礼装'];
+    //临时ssr_list存放点
+    let temp_ssr_list = [];
+    let temp_up_spirit = [];
+    let result = [];
+    let final = [];
+
+    //是否up开关
+    let is_up = 0;
+
+    //加载up从者列表
+    let $up_spirit = $('.is_pay>.up_spirit');
+    let html = `<option value="all" selected>请选择要up的5星从者</option>`;
+    for(let each of ssr_list){
+        html += `<option value="${each}">${each}</option>`;
+    }
+    $up_spirit.html(html);
+    //选择事件绑定
+    $up_spirit.mouseleave(() => {
+        let $up_ssr = $('.result_box4>.up_ssr');
+        if($up_spirit.val() !== 'all'){
+            $up_ssr.html(`up从者：${$up_spirit.val()}： <span>0</span>`).css({display: 'block'});
+        }else{
+            $up_ssr.css({display: 'none'});
+        }
+    });
+
+
+
+
+//    充值按钮事件绑定
+    $(() => {
+        //    获得剩余次数
+        let $surplus_times = $('.result_box1>.surplus_times>span');
+        $surplus_times.html(10);
+        // 获得充值次数
+        let $pay_times = $('.result_box1>.pay_times>span');
+        let $is_pay = $('.is_pay>button');
+        $is_pay.click(e => {
+            let $tar =  $(e.target);
+            $surplus_times.html(parseInt( $surplus_times.html()) + 10);
+            $pay_times.html(parseInt($pay_times.html()) + 1)
+        });
+    });
+
+//    抽卡按钮事件绑定
+    $(() => {
+        //    获得剩余次数
+        let $surplus_times = $('.result_box1>.surplus_times>span');
+        // 获取抽卡次数
+        let $times =  $('.result_box1>.times>span');
+
+
+        //十连抽卡事件
+        let $ten_draw = $('.card_box>button:first-child');
+        $ten_draw.click(e => {
+            let judge = 10;
+            //判断是否为up卡池
+            if($up_spirit.val() !== 'all'){
+                is_up = 1;
+            }
+            let $tar = $(e.target);
+            if(parseInt( $surplus_times.html()) >= 10){
+                $surplus_times.html(parseInt( $surplus_times.html()) - 10);
+                $times.html(parseInt($times.html()) + 10);
+                statistics(judge, is_up);
+            }else{
+                alert('同志不够抽拉，快去充钱啦~');
+            }
+        });
+
+        //一次抽卡事件
+        let $one_draw = $('.card_box>button:last-child');
+        $one_draw.click(e => {
+            let judge = 1;
+            if($up_spirit.val() !== 'all'){
+                is_up = 1;
+            }
+            let $tar = $(e.target);
+            if (parseInt($surplus_times.html()) >= 1) {
+                $surplus_times.html(parseInt($surplus_times.html()) - 1);
+                $times.html(parseInt($times.html()) + 1);
+                statistics(judge, is_up);
+            } else {
+                alert('同志不够抽拉，快去充钱啦~');
+            }
+        })
+    });
+
+
+
+//    点击事件触发函数（数据更换与抽卡）
+    let statistics = function(judge, is_up){
+        //转换方法
+        let change = function(message){
+            if(message === 'r_gift'){
+                let position =Math.floor(Math.random()*r_gift_list.length );
+                final.push([r_gift_list[position], 'border: 2px solid #a4a4a4;', 0]);
+            }
+            if(message === 'sr_gift'){
+                let position =Math.floor(Math.random()*sr_gift_list.length );
+                final.push([sr_gift_list[position], 'border: 2px solid red;', 1]);
+            }
+            if(message === 'ssr_gift'){
+                let position =Math.floor(Math.random()*ssr_gift_list.length );
+                final.push([ssr_gift_list[position], 'border: 2px solid #FFCF00;', 2]);
+            }
+            if(message === 'r'){
+                let position =Math.floor(Math.random()*r_list.length );
+                final.push([r_list[position], 'border: 2px solid #a4a4a4;', 3]);
+            }
+            if(message === 'sr'){
+                let position =Math.floor(Math.random()*sr_list.length );
+                final.push([sr_list[position], 'border: 2px solid red;', 4]);
+            }
+            if(message === 'ssr'){
+                if(is_up === 0){
+                    let position =Math.floor(Math.random()*temp_ssr_list.length );
+                    final.push([ssr_list[position], 'border: 2px solid #FFCF00;', 5]);
+                }else{
+                    let probability = Math.random();
+                    let position = probability < 0.7 ? temp_up_spirit[0] : temp_ssr_list[Math.floor(Math.random()*temp_ssr_list.length )];
+                    final.push([position, 'border: 2px solid #FFCF00;', 5]);
+                }
+            }
+        };
+
+        //显示动画
+        let draw_ani = function(){
+            let html = ``;
+            for(let each of final){
+                html += `<div style='${each[1]}'><span>${each[0]}</span></div>`;
+          }
+            let $this_times = $('.this_times_box');
+            $this_times.html(html);
+        };
+
+        //up卡池与普通卡池变动函数
+        let changeToUp = () => {
+            if(is_up === 0){
+                temp_up_spirit = [];
+                temp_ssr_list = ssr_list;
+            }else{
+                temp_up_spirit = [$up_spirit.val()];
+                temp_ssr_list = JSON.parse(JSON.stringify(ssr_list));
+                for(let i = 0; i < temp_ssr_list.length; i += 1){
+                    if(temp_ssr_list[i] === temp_up_spirit[0]){
+                        temp_ssr_list.splice(i, 1);
+                        break
+                    }
+                }
+
+            }
+        };
+
+
+        //抽卡
+        if(judge === 10){//十连算法
+            for(let i = 10; i > 0; i --){
+                let probability = Math.random();
+                probability > 0.6 ? result.push('r_gift') :
+                    probability > 0.2 ? result.push('r') :
+                        probability > 0.08 ? result.push('sr_gift') :
+                            probability > 0.04 ? result.push('ssr_gift') :
+                                probability > 0.01 ? result.push('sr') : result.push('ssr');
+                //console.log(result);
+            }
+            console.log(result);
+            //开始判断保底
+            let goldren = 0;//判断四星
+
+            for(let each of result){
+                if(each === 'sr_gift' || each === 'ssr_gift' || each === 'sr' || each === 'ssr'){
+                    goldren += 1;
+                }
+            }
+            if(goldren === 0){//保底四星
+                let probability = Math.random();
+                probability > 0.6 ? result[Math.floor(Math.random() * result.length)] = 'sr_gift' :
+                    probability > 0.2 ? result[Math.floor(Math.random() * result.length)] = 'sr' :
+                        probability > 0.01 ? result[Math.floor(Math.random() * result.length)] = 'ssr_gift' :
+                            result[Math.floor(Math.random() * result.length)] = 'ssr';
+            }
+            console.log(result);
+
+            let spirit_swift = 0;//判断英灵
+
+            for(let each of result){
+                if(each === 'r' || each === 'sr' || each === 'ssr'){
+                    spirit_swift += 1;
+                }
+            }
+            if(spirit_swift === 0){//保底英灵
+                //避免影响保底四星
+                let temp_result = [];
+                let i = 0;
+                for(let each of result){
+                    if(each === 'r_gift'){
+                        temp_result.push(i);
+                        i += 1;
+                    }
+                }
+                console.log(temp_result);
+                let probability = Math.random();
+                probability > 0.9 ? result[temp_result[Math.floor(Math.random() * temp_result.length)]] = 'r' :
+                    probability > 0.01 ? result[temp_result[Math.floor(Math.random() * temp_result.length)]] = 'sr' :
+                        result[temp_result[Math.floor(Math.random() * temp_result.length)]] = 'ssr';
+            }
+            console.log(result);
+            changeToUp();
+            for(let each of result){
+                change(each);
+            }
+            result = [];
+            console.log(temp_ssr_list, temp_up_spirit);
+            console.log(final);
+            draw_ani();
+
+
+
+
+        }else{//单抽算法
+            let probability = Math.random();
+            probability > 0.6 ? result.push('r_gift') :
+                probability > 0.2 ? result.push('r') :
+                    probability > 0.08 ? result.push('sr_gift') :
+                        probability > 0.04 ? result.push('ssr_gift') :
+                            probability > 0.01 ? result.push('sr') : result.push('ssr');
+            changeToUp();
+            change(result[0]);
+            result = [];
+            draw_ani();
+        }
+
+
+
+        //数据更换
+        for(let each of final){
+            //获取3星礼装
+            let $r_gift = $('.result_box3>.r_gift>span');
+            //获取4星礼装
+            let $sr_gift = $('.result_box3>.sr_gift>span');
+            //获取5星礼装
+            let $ssr_gift = $('.result_box3>.ssr_gift>span');
+            //获取3星英灵
+            let $r = $('.result_box2>.r_spirit>span');
+            //获取4星英灵
+            let $sr = $('.result_box2>.sr_spirit>span');
+            //获取5星英灵
+            let $ssr = $('.result_box2>.ssr_spirit>span');
+            //获取up英灵
+            let $up_ssr = $('.result_box4>.up_ssr>span');
+            if(each[2] === 0){
+                $r_gift.html(parseInt($r_gift.html()) + 1)
+            }else if(each[2] === 1){
+                $sr_gift.html(parseInt($sr_gift.html()) + 1)
+            }else if(each[2] === 2){
+                $ssr_gift.html(parseInt($ssr_gift.html()) + 1)
+            }else if(each[2] === 3){
+                $r.html(parseInt($r.html()) + 1)
+            }else if(each[2] === 4) {
+                $sr.html(parseInt($sr.html()) + 1)
+            }else{
+                $ssr.html(parseInt($ssr.html()) + 1);
+                if(is_up === 1 && each[0] === temp_up_spirit[0]){
+                    $up_ssr.html(parseInt($up_ssr.html()) + 1);
+                }
+            }
+        }
+        final = [];
+
+    }
+</script>
+</html>
