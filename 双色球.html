@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>拟双色球</title>
+</head>
+
+<script>
+	function begin(){
+		var rlist = [];
+		while(true){
+			var red = parseInt(Math.random()*33+1);
+			for(var i = 0; i < rlist.length; i++){
+				if(red == rlist[i]){
+					break;
+				}			
+			}
+			if(i == rlist.length){
+				rlist.push(red);
+			}
+			if(rlist.length == 6){
+				break;
+			}
+		}
+		rlist = rlist.sort(function(a, b){return a- b})
+		document.getElementById('red').innerHTML = rlist.join('、');
+		var blue = parseInt(Math.random()*16+1);
+		document.getElementById('blue').innerHTML = blue;
+		
+	}
+	
+	function open1(){
+		var rlist = [];
+		while(true){
+			var red = parseInt(Math.random()*33+1);
+			for(var i = 0; i < rlist.length; i++){
+				if(red == rlist[i]){
+					break;
+				}			
+			}
+			if(i == rlist.length){
+				rlist.push(red);
+			}
+			if(rlist.length == 6){
+				break;
+			}
+		}
+		var blue = parseInt(Math.random()*16+1);
+		rlist = rlist.sort(function(a, b){return a- b})
+		document.getElementById('reward').innerHTML = "<br>红球：" + rlist.join('、') + "<br>蓝球：" + blue.toString() ;
+	}
+</script>
+
+<body>
+	红球：<span id="red"></span><br>
+	蓝球：<span id="blue"></span><br>
+	<button id="begin" onclick="begin();">开抽</button><br>
+	开奖：<span id="reward"></span><br>
+	<button onclick="open1();">开奖</button>
+</body>
+</html>
